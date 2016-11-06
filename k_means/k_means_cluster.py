@@ -43,13 +43,37 @@ data_dict = pickle.load( open("../final_project/final_project_dataset.pkl", "r")
 ### there's an outlier--remove it! 
 data_dict.pop("TOTAL", 0)
 
+eso = []
+for k, v in data_dict.items():
+    option = v['exercised_stock_options']
+    eso.append(option)
+
+eso.sort()
+eso = [x for x in eso if x != 'NaN']
+print eso
+
+def featureScaling(arr):
+    featured = []
+    arr.sort()
+    for a in arr:
+      top = a-arr[0]
+      bottom = arr[-1]-arr[0]
+      value = float(top)/bottom
+      featured.append(value)
+    
+    return featured
+
+set_data = [3285, 1000000, 34348384]
+print featureScaling(set_data)
+
 
 ### the input features we want to use 
 ### can be any key in the person-level dictionary (salary, director_fees, etc.) 
 feature_1 = "salary"
 feature_2 = "exercised_stock_options"
+feature_3 = "total_payments"
 poi  = "poi"
-features_list = [poi, feature_1, feature_2]
+features_list = [poi, feature_1, feature_2, feature_3]
 data = featureFormat(data_dict, features_list )
 poi, finance_features = targetFeatureSplit( data )
 
@@ -58,14 +82,17 @@ poi, finance_features = targetFeatureSplit( data )
 ### you'll want to change this line to 
 ### for f1, f2, _ in finance_features:
 ### (as it's currently written, the line below assumes 2 features)
-for f1, f2 in finance_features:
+for f1, f2, f3 in finance_features:
     plt.scatter( f1, f2 )
 plt.show()
 
 ### cluster here; create predictions of the cluster labels
 ### for the data and store them to a list called pred
 
-
+from sklearn.cluster import KMeans
+import numpy as np
+kmeans = KMeans(n_clusters=2).fit(finance_features)
+pred = kmeans.predict(finance_features)
 
 
 ### rename the "name" parameter when you change the number of features
